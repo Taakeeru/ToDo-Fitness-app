@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
+import FitnessModule from "@/app/components/FitnessModule";
 
 // --- TRANSLATION SYSTEM ---
 const FLAGS: Record<string, string> = {
@@ -42,6 +43,10 @@ const translations: Record<Lang, Record<string, string>> = {
     keinAccount: "Noch kein Account?",
     schonAccount: "Schon einen Account?",
     authFehler: "Fehler bei der Anmeldung.",
+    sitz: "Sitz",
+    gewicht: "Gewicht",
+    saetze: "Sätze",
+    wdh: "Wdh.",
   },
   en: {
     fokus: "Focus.",
@@ -68,6 +73,10 @@ const translations: Record<Lang, Record<string, string>> = {
     keinAccount: "No account yet?",
     schonAccount: "Already have an account?",
     authFehler: "Login failed.",
+    sitz: "Seat",
+    gewicht: "Weight",
+    saetze: "Sets",
+    wdh: "Reps",
   },
   tr: {
     fokus: "Odak.",
@@ -94,6 +103,10 @@ const translations: Record<Lang, Record<string, string>> = {
     keinAccount: "Hesabın yok mu?",
     schonAccount: "Zaten hesabın var mı?",
     authFehler: "Giriş başarısız.",
+    sitz: "Koltuk",
+    gewicht: "Ağırlık",
+    saetze: "Set",
+    wdh: "Tekrar",
   },
   es: {
     fokus: "Enfoque.",
@@ -120,6 +133,10 @@ const translations: Record<Lang, Record<string, string>> = {
     keinAccount: "¿Sin cuenta?",
     schonAccount: "¿Ya tienes cuenta?",
     authFehler: "Fallo al iniciar sesión.",
+    sitz: "Asiento",
+    gewicht: "Peso",
+    saetze: "Series",
+    wdh: "Reps",
   },
   it: {
     fokus: "Focus.",
@@ -146,6 +163,10 @@ const translations: Record<Lang, Record<string, string>> = {
     keinAccount: "Nessun account?",
     schonAccount: "Hai già un account?",
     authFehler: "Errore di login.",
+    sitz: "Seduta",
+    gewicht: "Peso",
+    saetze: "Serie",
+    wdh: "Rip.",
   },
   fr: {
     fokus: "Focus.",
@@ -172,6 +193,10 @@ const translations: Record<Lang, Record<string, string>> = {
     keinAccount: "Pas encore de compte ?",
     schonAccount: "Déjà un compte ?",
     authFehler: "Échec de la connexion.",
+    sitz: "Siège",
+    gewicht: "Poids",
+    saetze: "Séries",
+    wdh: "Reps",
   },
 };
 
@@ -482,7 +507,7 @@ export default function Home() {
     };
   }, []);
 
-  // Fetch TODOS, Theme & Language
+  // Fetch TODOS, Theme, Language & Active Tab
   useEffect(() => {
     if (user) fetchTodos();
     try {
@@ -492,6 +517,10 @@ export default function Home() {
     try {
       const langStored = window.localStorage.getItem("language");
       if (langStored && LANGS.includes(langStored as Lang)) setLang(langStored as Lang);
+    } catch {}
+    try {
+      const tabStored = window.localStorage.getItem("activeTab");
+      if (tabStored === "todo" || tabStored === "fitness") setActiveTab(tabStored);
     } catch {}
   // eslint-disable-next-line
   }, [user]);
@@ -507,6 +536,12 @@ export default function Home() {
       window.localStorage.setItem("language", lang);
     } catch {}
   }, [lang]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("activeTab", activeTab);
+    } catch {}
+  }, [activeTab]);
 
   // --- Hover Styles for Todo Items ---
   const [hoveredTodoId, setHoveredTodoId] = useState<number | null>(null);
@@ -939,9 +974,7 @@ export default function Home() {
             </div>
           )}
           {activeTab === "fitness" && (
-            <div className="flex flex-col items-center min-h-[320px] justify-center py-12 text-center text-xl italic text-[#8E8E93]">
-              {t.baldFitness}
-            </div>
+            <FitnessModule user={user} darkMode={darkMode} t={t} />
           )}
         </div>
         {/* FOOTER */}
